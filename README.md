@@ -1,12 +1,22 @@
-# Modbus MITM (Man-in-the-Middle) Tool
+# ICS_ATTACK
+
+A collection of Industrial Control Systems (ICS) security testing tools and attack demonstrations.
+
+## About
+
+This repository contains various tools and scripts for testing and demonstrating security vulnerabilities in Industrial Control Systems, including SCADA networks and PLC communications. These tools are designed for educational purposes and authorized security testing only.
+
+## Tools Included
+
+### Modbus MITM (Man-in-the-Middle) Tool
 
 A Python script for performing Man-in-the-Middle attacks on Modbus TCP communications using Scapy.
 
-## Description
+#### Description
 
 This tool demonstrates how to intercept and modify Modbus TCP packets in a network environment. It constructs and injects custom Modbus TCP packets to simulate communication between a Modbus master and PLC (Programmable Logic Controller).
 
-## Features
+#### Features
 
 - Constructs Modbus TCP packets with custom parameters
 - Supports Modbus function code 5 (Write Single Register)
@@ -14,17 +24,17 @@ This tool demonstrates how to intercept and modify Modbus TCP packets in a netwo
 - Customizable TCP sequence and acknowledgment numbers
 - Packet injection using Scapy
 
-## Requirements
+#### Requirements
 
 - Python 3.x
 - Scapy library
 
-## Installation
+#### Installation
 
 1. Clone this repository:
 ```bash
-git clone <your-repo-url>
-cd modbus-mitm
+git clone https://github.com/nasreddi/ICS_ATTACK.git
+cd ICS_ATTACK
 ```
 
 2. Install required dependencies:
@@ -32,7 +42,7 @@ cd modbus-mitm
 pip install scapy
 ```
 
-## Usage
+#### Usage
 
 1. Configure the network parameters in the script:
    - `ip_master`: IP address of the Modbus master
@@ -52,17 +62,17 @@ pip install scapy
 python MITM_MODBUS.py
 ```
 
-## Configuration
+#### Configuration
 
 The script includes the following configurable parameters:
 
-### Network Configuration
+##### Network Configuration
 - `ip_master = "192.168.1.60"` - Master device IP
 - `ip_plc = "192.168.1.20"` - PLC device IP
 - `sport = 12345` - Source TCP port
 - `dport = 502` - Modbus TCP port
 
-### Modbus Configuration
+##### Modbus Configuration
 - `transaction_id = 0x0001` - Transaction identifier
 - `function_code = 5` - Write Single Register function
 - `register_address = 0x000A` - Target register address
@@ -70,11 +80,11 @@ The script includes the following configurable parameters:
 
 ## Security Notice
 
-⚠️ **WARNING**: This tool is for educational and authorized testing purposes only. Only use this tool on networks you own or have explicit permission to test. Unauthorized network interception may violate laws and regulations.
+⚠️ **WARNING**: These tools are for educational and authorized testing purposes only. Only use these tools on networks you own or have explicit permission to test. Unauthorized network interception and attacks may violate laws and regulations.
 
 ## Legal Disclaimer
 
-This software is provided for educational purposes only. The authors are not responsible for any misuse of this tool. Users must ensure they have proper authorization before using this tool on any network.
+This software is provided for educational purposes only. The authors are not responsible for any misuse of these tools. Users must ensure they have proper authorization before using these tools on any network.
 
 ## License
 
