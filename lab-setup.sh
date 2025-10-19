@@ -87,14 +87,34 @@ create_directories() {
 install_python_dependencies() {
     print_status "Installation des dépendances Python..."
     
-    pip3 install scapy python-nmap psutil requests
+    # Créer un environnement virtuel Python
+    if [ ! -d ".venv" ]; then
+        print_status "Création de l'environnement virtuel Python..."
+        python3 -m venv .venv
+    fi
     
-    print_success "Dépendances Python installées"
+    # Activer l'environnement virtuel
+    print_status "Activation de l'environnement virtuel..."
+    source .venv/bin/activate
+    
+    # Installer les dépendances dans l'environnement virtuel
+    print_status "Installation des packages Python..."
+    pip install --upgrade pip
+    pip install scapy python-nmap psutil requests
+    
+    print_success "Dépendances Python installées dans l'environnement virtuel"
 }
 
 # Créer les fichiers de configuration
 create_config_files() {
     print_status "Création des fichiers de configuration..."
+    
+    # Créer les répertoires de configuration s'ils n'existent pas
+    mkdir -p lab-config/openplc/config
+    mkdir -p lab-config/fuxa/config
+    mkdir -p lab-config/modbus-slave/config
+    mkdir -p lab-config/iec104/config
+    mkdir -p lab-config/dnp3/config
     
     # Configuration OpenPLC
     cat > lab-config/openplc/config/plc_config.json << EOF
@@ -365,6 +385,13 @@ show_connection_info() {
     echo "Redémarrer:         docker-compose restart"
     echo "Voir les logs:      docker-compose logs -f"
     echo "Statut des services: docker-compose ps"
+    echo ""
+    echo "🐍 Environnement Python"
+    echo "======================="
+    echo "Activer l'env virtuel: source .venv/bin/activate"
+    echo "Désactiver l'env virtuel: deactivate"
+    echo "Lancer les tests:     python3 test-scenarios.py"
+    echo "Lancer les attaques:  python3 OT_ICS_ATTACK_*.py"
     echo ""
 }
 
