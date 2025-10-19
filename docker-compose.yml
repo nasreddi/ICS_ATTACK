@@ -1,0 +1,196 @@
+version: '3.8'
+
+services:
+  # OpenPLC Runtime - Simulateur de PLC avec Modbus TCP
+  openplc:
+    image: thiagoralves/openplc-runtime:latest
+    container_name: openplc-runtime
+    ports:
+      - "8080:8080"  # Interface web OpenPLC
+      - "502:502"    # Modbus TCP
+    networks:
+      ot-ics-lab:
+        ipv4_address: 192.168.1.10
+    environment:
+      - PLC_NAME=TestPLC
+      - PLC_IP=192.168.1.10
+    volumes:
+      - ./lab-config/openplc:/opt/openplc
+      - ./lab-config/programs:/opt/openplc/programs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # FUXA SCADA - Interface HMI/SCADA
+  fuxa:
+    image: frangoteam/fuxa:latest
+    container_name: fuxa-scada
+    ports:
+      - "1881:1881"  # Interface web FUXA
+    networks:
+      ot-ics-lab:
+        ipv4_address: 192.168.1.20
+    environment:
+      - FUXA_PORT=1881
+      - FUXA_IP=192.168.1.20
+    volumes:
+      - ./lab-config/fuxa:/data
+    depends_on:
+      - openplc
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1881"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Modbus Slave Simulator - Simulateur Modbus avancé
+  modbus-slave:
+    image: oitc/modbus-slave:latest
+    container_name: modbus-slave
+    ports:
+      - "503:502"    # Modbus TCP (port différent)
+    networks:
+      ot-ics-lab:
+        ipv4_address: 192.168.1.30
+    environment:
+      - SLAVE_ID=1
+      - SLAVE_IP=192.168.1.30
+    volumes:
+      - ./lab-config/modbus-slave:/config
+    restart: unless-stopped
+
+  # IEC 104 Simulator - Simulateur IEC 104
+  iec104-simulator:
+    image: mz-automation/iec104simulator:latest
+    container_name: iec104-simulator
+    ports:
+      - "2404:2404"  # IEC 104 port
+    networks:
+      ot-ics-lab:
+        ipv4_address: 192.168.1.40
+    environment:
+      - IEC104_PORT=2404
+      - IEC104_IP=192.168.1.40
+    volumes:
+      - ./lab-config/iec104:/config
+    restart: unless-stopped
+
+  # DNP3 Simulator - Simulateur DNP3
+  dnp3-simulator:
+    image: opendnp3/dnp3simulator:latest
+    container_name: dnp3-simulator
+    ports:
+      - "20000:20000"  # DNP3 port
+    networks:
+      ot-ics-lab:
+        ipv4_address: 192.168.1.50
+    environment:
+      - DNP3_PORT=20000
+      - DNP3_IP=192.168.1.50
+    volumes:
+      - ./lab-config/dnp3:/config
+    restart: unless-stopped
+
+  # Wireshark - Outil de capture réseau
+  wireshark:
+    image: linuxserver/wireshark:latest
+    container_name: wireshark
+    ports:
+      - "3000:3000"  # Interface web Wireshark
+    networks:
+      - ot-ics-lab
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - ./lab-config/wireshark:/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    restart: unless-stopped
+
+  # ELK Stack - Logging et monitoring
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    networks:
+      - ot-ics-lab
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - ./lab-config/elasticsearch:/usr/share/elasticsearch/data
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - ot-ics-lab
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.8.0
+    container_name: logstash
+    networks:
+      - ot-ics-lab
+    volumes:
+      - ./lab-config/logstash:/usr/share/logstash/pipeline
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  # Grafana - Dashboard de monitoring
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    networks:
+      - ot-ics-lab
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - ./lab-config/grafana:/var/lib/grafana
+    restart: unless-stopped
+
+  # InfluxDB - Base de données temporelle
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    networks:
+      - ot-ics-lab
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
+      - DOCKER_INFLUXDB_INIT_ORG=ot-ics-lab
+      - DOCKER_INFLUXDB_INIT_BUCKET=ot-ics-data
+    volumes:
+      - ./lab-config/influxdb:/var/lib/influxdb2
+    restart: unless-stopped
+
+networks:
+  ot-ics-lab:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
