@@ -1,0 +1,281 @@
+{
+  "name": "OT/ICS Attack Test Dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard de test pour les attaques OT/ICS",
+  "created": "2025-01-19T12:00:00.000Z",
+  "modified": "2025-01-19T12:00:00.000Z",
+  "devices": [
+    {
+      "id": "openplc-device",
+      "name": "OpenPLC Device",
+      "type": "modbus",
+      "host": "192.168.1.10",
+      "port": 502,
+      "unit_id": 1,
+      "enabled": true,
+      "tags": [
+        {
+          "id": "input1",
+          "name": "Input 1",
+          "address": "0.0",
+          "type": "coil",
+          "description": "Entrée digitale 1"
+        },
+        {
+          "id": "input2", 
+          "name": "Input 2",
+          "address": "0.1",
+          "type": "coil",
+          "description": "Entrée digitale 2"
+        },
+        {
+          "id": "output1",
+          "name": "Output 1", 
+          "address": "0.0",
+          "type": "coil",
+          "description": "Sortie digitale 1"
+        },
+        {
+          "id": "output2",
+          "name": "Output 2",
+          "address": "0.1", 
+          "type": "coil",
+          "description": "Sortie digitale 2"
+        },
+        {
+          "id": "counter",
+          "name": "Counter",
+          "address": "0.0",
+          "type": "holding_register",
+          "description": "Compteur"
+        },
+        {
+          "id": "temperature",
+          "name": "Temperature",
+          "address": "0.2",
+          "type": "holding_register", 
+          "description": "Température simulée"
+        }
+      ]
+    },
+    {
+      "id": "modbus-slave-device",
+      "name": "Modbus Slave Simulator",
+      "type": "modbus",
+      "host": "192.168.1.30",
+      "port": 503,
+      "unit_id": 1,
+      "enabled": true,
+      "tags": [
+        {
+          "id": "slave_input1",
+          "name": "Slave Input 1",
+          "address": "0.0",
+          "type": "discrete_input",
+          "description": "Entrée esclave 1"
+        },
+        {
+          "id": "slave_analog1",
+          "name": "Slave Analog 1", 
+          "address": "0.0",
+          "type": "input_register",
+          "description": "Entrée analogique esclave 1"
+        }
+      ]
+    }
+  ],
+  "views": [
+    {
+      "id": "main-dashboard",
+      "name": "Main Dashboard",
+      "description": "Tableau de bord principal pour les tests OT/ICS",
+      "width": 1920,
+      "height": 1080,
+      "components": [
+        {
+          "id": "title",
+          "type": "text",
+          "x": 50,
+          "y": 50,
+          "width": 400,
+          "height": 60,
+          "text": "OT/ICS Attack Test Laboratory",
+          "font_size": 24,
+          "font_color": "#ffffff",
+          "background_color": "#2c3e50"
+        },
+        {
+          "id": "input1_button",
+          "type": "button",
+          "x": 100,
+          "y": 150,
+          "width": 120,
+          "height": 60,
+          "text": "Input 1",
+          "font_size": 14,
+          "background_color": "#3498db",
+          "text_color": "#ffffff",
+          "device": "openplc-device",
+          "tag": "input1",
+          "action": "write"
+        },
+        {
+          "id": "input2_button",
+          "type": "button", 
+          "x": 250,
+          "y": 150,
+          "width": 120,
+          "height": 60,
+          "text": "Input 2",
+          "font_size": 14,
+          "background_color": "#3498db",
+          "text_color": "#ffffff",
+          "device": "openplc-device",
+          "tag": "input2",
+          "action": "write"
+        },
+        {
+          "id": "output1_led",
+          "type": "led",
+          "x": 100,
+          "y": 250,
+          "width": 60,
+          "height": 60,
+          "color": "#e74c3c",
+          "device": "openplc-device",
+          "tag": "output1"
+        },
+        {
+          "id": "output1_label",
+          "type": "text",
+          "x": 180,
+          "y": 270,
+          "width": 100,
+          "height": 20,
+          "text": "Output 1",
+          "font_size": 12,
+          "font_color": "#ffffff"
+        },
+        {
+          "id": "output2_led",
+          "type": "led",
+          "x": 250,
+          "y": 250,
+          "width": 60,
+          "height": 60,
+          "color": "#e74c3c",
+          "device": "openplc-device",
+          "tag": "output2"
+        },
+        {
+          "id": "output2_label",
+          "type": "text",
+          "x": 330,
+          "y": 270,
+          "width": 100,
+          "height": 20,
+          "text": "Output 2",
+          "font_size": 12,
+          "font_color": "#ffffff"
+        },
+        {
+          "id": "counter_display",
+          "type": "text",
+          "x": 100,
+          "y": 350,
+          "width": 200,
+          "height": 40,
+          "text": "Counter: ",
+          "font_size": 16,
+          "font_color": "#ffffff",
+          "background_color": "#34495e",
+          "device": "openplc-device",
+          "tag": "counter",
+          "format": "Counter: {value}"
+        },
+        {
+          "id": "temperature_gauge",
+          "type": "gauge",
+          "x": 400,
+          "y": 150,
+          "width": 200,
+          "height": 200,
+          "min_value": 0,
+          "max_value": 100,
+          "unit": "°C",
+          "device": "openplc-device",
+          "tag": "temperature",
+          "format": "{value}°C"
+        },
+        {
+          "id": "temperature_label",
+          "type": "text",
+          "x": 400,
+          "y": 120,
+          "width": 200,
+          "height": 30,
+          "text": "Temperature",
+          "font_size": 14,
+          "font_color": "#ffffff",
+          "align": "center"
+        },
+        {
+          "id": "attack_status",
+          "type": "text",
+          "x": 100,
+          "y": 450,
+          "width": 500,
+          "height": 30,
+          "text": "Attack Status: Ready",
+          "font_size": 14,
+          "font_color": "#27ae60",
+          "background_color": "#2c3e50"
+        },
+        {
+          "id": "connection_status",
+          "type": "text",
+          "x": 100,
+          "y": 500,
+          "width": 500,
+          "height": 30,
+          "text": "Connections: OpenPLC ✓ | Modbus Slave ✓",
+          "font_size": 12,
+          "font_color": "#95a5a6",
+          "background_color": "#2c3e50"
+        }
+      ]
+    }
+  ],
+  "alarms": [
+    {
+      "id": "high_temperature",
+      "name": "High Temperature",
+      "device": "openplc-device",
+      "tag": "temperature",
+      "condition": ">",
+      "value": 80,
+      "message": "Temperature is too high!",
+      "severity": "high",
+      "enabled": true
+    },
+    {
+      "id": "connection_lost",
+      "name": "Connection Lost",
+      "device": "openplc-device",
+      "condition": "disconnected",
+      "message": "Connection to OpenPLC lost!",
+      "severity": "critical",
+      "enabled": true
+    }
+  ],
+  "scripts": [
+    {
+      "id": "attack_test_script",
+      "name": "Attack Test Script",
+      "description": "Script pour tester les attaques OT/ICS",
+      "language": "javascript",
+      "code": "// Script de test d'attaque\nfunction testAttack() {\n    console.log('Starting attack test...');\n    // Logique de test d'attaque\n    return true;\n}\n",
+      "enabled": true
+    }
+  ]
+}

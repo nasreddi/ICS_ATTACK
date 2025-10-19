@@ -1,0 +1,18 @@
+{
+  "server": {
+    "port": 1881,
+    "ip": "192.168.1.20"
+  },
+  "modbus": {
+    "host": "192.168.1.10",
+    "port": 502,
+    "unit_id": 1
+  },
+  "ui": {
+    "theme": "dark",
+    "language": "en"
+  },
+  "projects": {
+    "default_project": "ot-ics-test-project"
+  }
+}

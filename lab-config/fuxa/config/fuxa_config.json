@@ -1,0 +1,152 @@
+{
+  "server": {
+    "port": 1881,
+    "ip": "192.168.1.20",
+    "hostname": "fuxa-scada",
+    "protocol": "http"
+  },
+  "security": {
+    "authentication": {
+      "enabled": false,
+      "username": "admin",
+      "password": "admin123"
+    },
+    "cors": {
+      "enabled": true,
+      "origins": ["*"]
+    }
+  },
+  "modbus": {
+    "connections": [
+      {
+        "id": "openplc-connection",
+        "name": "OpenPLC Device",
+        "type": "tcp",
+        "host": "192.168.1.10",
+        "port": 502,
+        "unit_id": 1,
+        "timeout": 5000,
+        "retry_interval": 3000,
+        "enabled": true
+      },
+      {
+        "id": "modbus-slave-connection",
+        "name": "Modbus Slave Simulator",
+        "type": "tcp",
+        "host": "192.168.1.30",
+        "port": 503,
+        "unit_id": 1,
+        "timeout": 5000,
+        "retry_interval": 3000,
+        "enabled": true
+      }
+    ]
+  },
+  "iec104": {
+    "connections": [
+      {
+        "id": "iec104-connection",
+        "name": "IEC 104 Simulator",
+        "host": "192.168.1.40",
+        "port": 2404,
+        "asdu_address": 1,
+        "timeout": 10000,
+        "enabled": true
+      }
+    ]
+  },
+  "dnp3": {
+    "connections": [
+      {
+        "id": "dnp3-connection",
+        "name": "DNP3 Simulator",
+        "host": "192.168.1.50",
+        "port": 20000,
+        "outstation_id": 1,
+        "timeout": 10000,
+        "enabled": true
+      }
+    ]
+  },
+  "opcua": {
+    "connections": [
+      {
+        "id": "opcua-connection",
+        "name": "OPC UA Simulator",
+        "endpoint": "opc.tcp://192.168.1.60:4840",
+        "security_mode": "None",
+        "security_policy": "None",
+        "timeout": 10000,
+        "enabled": false
+      }
+    ]
+  },
+  "data_logging": {
+    "enabled": true,
+    "interval": 1000,
+    "max_records": 10000,
+    "storage": {
+      "type": "file",
+      "path": "/data/logs",
+      "format": "json"
+    }
+  },
+  "alarms": {
+    "enabled": true,
+    "max_alarms": 1000,
+    "notification": {
+      "email": {
+        "enabled": false,
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587,
+        "username": "",
+        "password": "",
+        "from": "",
+        "to": []
+      },
+      "webhook": {
+        "enabled": false,
+        "url": "",
+        "headers": {}
+      }
+    }
+  },
+  "ui": {
+    "theme": "dark",
+    "language": "en",
+    "auto_save": true,
+    "auto_save_interval": 30000,
+    "show_grid": true,
+    "snap_to_grid": true,
+    "grid_size": 20
+  },
+  "projects": {
+    "default_project": "ot-ics-test-project",
+    "projects_path": "/data/projects",
+    "backup": {
+      "enabled": true,
+      "interval": 3600000,
+      "max_backups": 10,
+      "backup_path": "/data/backups"
+    }
+  },
+  "monitoring": {
+    "performance": {
+      "enabled": true,
+      "interval": 5000,
+      "metrics": ["cpu", "memory", "connections", "data_rate"]
+    },
+    "health_check": {
+      "enabled": true,
+      "interval": 10000,
+      "timeout": 5000
+    }
+  },
+  "development": {
+    "debug": false,
+    "log_level": "info",
+    "console_log": true,
+    "file_log": true,
+    "log_file": "/data/logs/fuxa.log"
+  }
+}
