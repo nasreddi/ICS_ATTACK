@@ -8,21 +8,80 @@ This repository contains various tools and scripts for testing and demonstrating
 
 ## Tools Included
 
-### Modbus MITM (Man-in-the-Middle) Tool
+### 1. Modbus MITM (Man-in-the-Middle) Tool
+**File:** `MITM_MODBUS.py`
 
 A Python script for performing Man-in-the-Middle attacks on Modbus TCP communications using Scapy.
 
 #### Description
-
 This tool demonstrates how to intercept and modify Modbus TCP packets in a network environment. It constructs and injects custom Modbus TCP packets to simulate communication between a Modbus master and PLC (Programmable Logic Controller).
 
 #### Features
-
 - Constructs Modbus TCP packets with custom parameters
 - Supports Modbus function code 5 (Write Single Register)
 - Configurable source and destination IP addresses
 - Customizable TCP sequence and acknowledgment numbers
 - Packet injection using Scapy
+
+### 2. S7CommPlus MITM Tool
+**File:** `MITM_S7COMMPLUS.py`
+
+A comprehensive attack tool targeting Siemens S7-1200/1500 PLCs using the S7CommPlus protocol.
+
+#### Features
+- Read/Write operations on PLC data blocks
+- CPU stop commands
+- Malicious code injection
+- System reconnaissance
+- Multiple attack vectors
+
+### 3. S7Comm MITM Tool
+**File:** `MITM_S7COMM.py`
+
+Advanced attack tool for Siemens S7-300/400 PLCs using the S7Comm protocol.
+
+#### Features
+- Data block manipulation
+- Hot/Cold restart attacks
+- Malicious block download
+- DoS attacks
+- Code injection capabilities
+
+### 4. IEC 61850 MITM Tool
+**File:** `MITM_IEC61850.py`
+
+Sophisticated attack tool targeting IEC 61850 substation automation systems.
+
+#### Features
+- MMS (Manufacturing Message Specification) attacks
+- GOOSE message injection
+- Sampled Values (SV) manipulation
+- Association establishment attacks
+- GOOSE flooding attacks
+
+### 5. IEC 104 MITM Tool
+**File:** `MITM_IEC104.py`
+
+Comprehensive attack tool for IEC 104 telecontrol systems used in SCADA networks.
+
+#### Features
+- Single and double command injection
+- Setpoint manipulation
+- Clock synchronization attacks
+- Test command flooding
+- General interrogation attacks
+
+### 6. DNP3 MITM Tool
+**File:** `MITM_DNP3.py`
+
+Advanced attack tool targeting DNP3 (Distributed Network Protocol) systems.
+
+#### Features
+- Direct operate commands
+- Select and operate sequences
+- Analog output manipulation
+- Time synchronization attacks
+- Cold/Warm restart attacks
 
 #### Requirements
 
@@ -57,26 +116,54 @@ pip install scapy
    - `register_address`: Target register address
    - `register_value`: Value to write to the register
 
-3. Run the script:
+3. Run any of the scripts:
 ```bash
 python MITM_MODBUS.py
+python MITM_S7COMMPLUS.py
+python MITM_S7COMM.py
+python MITM_IEC61850.py
+python MITM_IEC104.py
+python MITM_DNP3.py
 ```
 
-#### Configuration
+#### General Configuration
 
-The script includes the following configurable parameters:
+All scripts include configurable network parameters:
 
-##### Network Configuration
-- `ip_master = "192.168.1.60"` - Master device IP
-- `ip_plc = "192.168.1.20"` - PLC device IP
-- `sport = 12345` - Source TCP port
-- `dport = 502` - Modbus TCP port
+##### Network Configuration (Common to all tools)
+- `ip_master` - Master/HMI/SCADA IP address
+- `ip_target` - Target device IP address (PLC/RTU/IED)
+- `sport` - Source TCP port
+- `dport` - Destination TCP port (protocol-specific)
+- `seq_num` and `ack_num` - TCP sequence and acknowledgment numbers
 
-##### Modbus Configuration
+##### Protocol-Specific Configuration
+
+**Modbus TCP:**
 - `transaction_id = 0x0001` - Transaction identifier
 - `function_code = 5` - Write Single Register function
 - `register_address = 0x000A` - Target register address
 - `register_value = 0x0019` - Value to write
+
+**S7Comm/S7CommPlus:**
+- `db_number` - Data block number
+- `area` - Memory area (DB, Input, Output, etc.)
+- `address` - Memory address offset
+
+**IEC 61850:**
+- `object_name` - Logical node object name
+- `goose_id` - GOOSE message identifier
+- `sv_id` - Sampled Values identifier
+
+**IEC 104:**
+- `asdu_addr` - ASDU address
+- `io_addr` - Information object address
+- `cot` - Cause of transmission
+
+**DNP3:**
+- `object_group` - Object group number
+- `object_variation` - Object variation
+- `index` - Point index
 
 ## Security Notice
 
