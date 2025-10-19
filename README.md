@@ -8,8 +8,8 @@ This repository contains various tools and scripts for testing and demonstrating
 
 ## Tools Included
 
-### 1. Modbus MITM (Man-in-the-Middle) Tool
-**File:** `MITM_MODBUS.py`
+### 1. Modbus OT/ICS Attack Tool
+**File:** `OT_ICS_ATTACK_MODBUS.py`
 
 A Python script for performing Man-in-the-Middle attacks on Modbus TCP communications using Scapy.
 
@@ -23,8 +23,8 @@ This tool demonstrates how to intercept and modify Modbus TCP packets in a netwo
 - Customizable TCP sequence and acknowledgment numbers
 - Packet injection using Scapy
 
-### 2. S7CommPlus MITM Tool
-**File:** `MITM_S7COMMPLUS.py`
+### 2. S7CommPlus OT/ICS Attack Tool
+**File:** `OT_ICS_ATTACK_S7COMMPLUS.py`
 
 A comprehensive attack tool targeting Siemens S7-1200/1500 PLCs using the S7CommPlus protocol.
 
@@ -35,8 +35,8 @@ A comprehensive attack tool targeting Siemens S7-1200/1500 PLCs using the S7Comm
 - System reconnaissance
 - Multiple attack vectors
 
-### 3. S7Comm MITM Tool
-**File:** `MITM_S7COMM.py`
+### 3. S7Comm OT/ICS Attack Tool
+**File:** `OT_ICS_ATTACK_S7COMM.py`
 
 Advanced attack tool for Siemens S7-300/400 PLCs using the S7Comm protocol.
 
@@ -47,8 +47,8 @@ Advanced attack tool for Siemens S7-300/400 PLCs using the S7Comm protocol.
 - DoS attacks
 - Code injection capabilities
 
-### 4. IEC 61850 MITM Tool
-**File:** `MITM_IEC61850.py`
+### 4. IEC 61850 OT/ICS Attack Tool
+**File:** `OT_ICS_ATTACK_IEC61850.py`
 
 Sophisticated attack tool targeting IEC 61850 substation automation systems.
 
@@ -59,8 +59,8 @@ Sophisticated attack tool targeting IEC 61850 substation automation systems.
 - Association establishment attacks
 - GOOSE flooding attacks
 
-### 5. IEC 104 MITM Tool
-**File:** `MITM_IEC104.py`
+### 5. IEC 104 OT/ICS Attack Tool
+**File:** `OT_ICS_ATTACK_IEC104.py`
 
 Comprehensive attack tool for IEC 104 telecontrol systems used in SCADA networks.
 
@@ -71,8 +71,8 @@ Comprehensive attack tool for IEC 104 telecontrol systems used in SCADA networks
 - Test command flooding
 - General interrogation attacks
 
-### 6. DNP3 MITM Tool
-**File:** `MITM_DNP3.py`
+### 6. DNP3 OT/ICS Attack Tool
+**File:** `OT_ICS_ATTACK_DNP3.py`
 
 Advanced attack tool targeting DNP3 (Distributed Network Protocol) systems.
 
@@ -118,12 +118,12 @@ pip install scapy
 
 3. Run any of the scripts:
 ```bash
-python MITM_MODBUS.py
-python MITM_S7COMMPLUS.py
-python MITM_S7COMM.py
-python MITM_IEC61850.py
-python MITM_IEC104.py
-python MITM_DNP3.py
+python OT_ICS_ATTACK_MODBUS.py
+python OT_ICS_ATTACK_S7COMMPLUS.py
+python OT_ICS_ATTACK_S7COMM.py
+python OT_ICS_ATTACK_IEC61850.py
+python OT_ICS_ATTACK_IEC104.py
+python OT_ICS_ATTACK_DNP3.py
 ```
 
 #### General Configuration
