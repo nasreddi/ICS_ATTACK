@@ -1,30 +1,28 @@
 version: '3.8'
 
 services:
-  # OpenPLC Runtime - Simulateur de PLC avec Modbus TCP
-  openplc:
-    image: thiagoralves/openplc-runtime:latest
-    container_name: openplc-runtime
+  # Modbus TCP Simulator - Simulateur Modbus simple et fiable
+  modbus-simulator:
+    image: oitc/modbus-slave:latest
+    container_name: modbus-simulator
     ports:
-      - "8080:8080"  # Interface web OpenPLC
       - "502:502"    # Modbus TCP
     networks:
       ot-ics-lab:
         ipv4_address: 192.168.1.10
     environment:
-      - PLC_NAME=TestPLC
-      - PLC_IP=192.168.1.10
+      - SLAVE_ID=1
+      - SLAVE_IP=192.168.1.10
     volumes:
-      - ./lab-config/openplc:/opt/openplc
-      - ./lab-config/programs:/opt/openplc/programs
+      - ./lab-config/modbus:/config
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      test: ["CMD", "nc", "-z", "localhost", "502"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # FUXA SCADA - Interface HMI/SCADA
+  # FUXA SCADA - Interface HMI/SCADA (image officielle)
   fuxa:
     image: frangoteam/fuxa:latest
     container_name: fuxa-scada
@@ -39,7 +37,7 @@ services:
     volumes:
       - ./lab-config/fuxa:/data
     depends_on:
-      - openplc
+      - modbus-simulator
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:1881"]
@@ -47,53 +45,27 @@ services:
       timeout: 10s
       retries: 3
 
-  # Modbus Slave Simulator - Simulateur Modbus avancé
-  modbus-slave:
-    image: oitc/modbus-slave:latest
-    container_name: modbus-slave
+  # OpenPLC Runtime - Alternative avec image plus stable
+  openplc:
+    image: thiagoralves/openplc-runtime:latest
+    container_name: openplc-runtime
     ports:
-      - "503:502"    # Modbus TCP (port différent)
+      - "8080:8080"  # Interface web OpenPLC
+      - "5020:502"   # Modbus TCP (port alternatif)
     networks:
       ot-ics-lab:
         ipv4_address: 192.168.1.30
     environment:
-      - SLAVE_ID=1
-      - SLAVE_IP=192.168.1.30
+      - PLC_NAME=TestPLC
+      - PLC_IP=192.168.1.30
     volumes:
-      - ./lab-config/modbus-slave:/config
+      - ./lab-config/openplc:/opt/openplc
     restart: unless-stopped
-
-  # IEC 104 Simulator - Simulateur IEC 104
-  iec104-simulator:
-    image: mz-automation/iec104simulator:latest
-    container_name: iec104-simulator
-    ports:
-      - "2404:2404"  # IEC 104 port
-    networks:
-      ot-ics-lab:
-        ipv4_address: 192.168.1.40
-    environment:
-      - IEC104_PORT=2404
-      - IEC104_IP=192.168.1.40
-    volumes:
-      - ./lab-config/iec104:/config
-    restart: unless-stopped
-
-  # DNP3 Simulator - Simulateur DNP3
-  dnp3-simulator:
-    image: opendnp3/dnp3simulator:latest
-    container_name: dnp3-simulator
-    ports:
-      - "20000:20000"  # DNP3 port
-    networks:
-      ot-ics-lab:
-        ipv4_address: 192.168.1.50
-    environment:
-      - DNP3_PORT=20000
-      - DNP3_IP=192.168.1.50
-    volumes:
-      - ./lab-config/dnp3:/config
-    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Wireshark - Outil de capture réseau
   wireshark:
@@ -115,46 +87,6 @@ services:
       - NET_RAW
     restart: unless-stopped
 
-  # ELK Stack - Logging et monitoring
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
-    container_name: elasticsearch
-    ports:
-      - "9200:9200"
-    networks:
-      - ot-ics-lab
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    volumes:
-      - ./lab-config/elasticsearch:/usr/share/elasticsearch/data
-    restart: unless-stopped
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.8.0
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    networks:
-      - ot-ics-lab
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-    restart: unless-stopped
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.8.0
-    container_name: logstash
-    networks:
-      - ot-ics-lab
-    volumes:
-      - ./lab-config/logstash:/usr/share/logstash/pipeline
-    depends_on:
-      - elasticsearch
-    restart: unless-stopped
-
   # Grafana - Dashboard de monitoring
   grafana:
     image: grafana/grafana:latest
@@ -165,8 +97,46 @@ services:
       - ot-ics-lab
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_SECURITY_ADMIN_USER=admin
     volumes:
       - ./lab-config/grafana:/var/lib/grafana
+    restart: unless-stopped
+
+  # Prometheus - Monitoring et métriques
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - ot-ics-lab
+    volumes:
+      - ./lab-config/prometheus:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+
+  # Node Exporter - Métriques système
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - ot-ics-lab
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     restart: unless-stopped
 
   # InfluxDB - Base de données temporelle
@@ -185,6 +155,35 @@ services:
       - DOCKER_INFLUXDB_INIT_BUCKET=ot-ics-data
     volumes:
       - ./lab-config/influxdb:/var/lib/influxdb2
+    restart: unless-stopped
+
+  # ELK Stack - Logging et monitoring (version allégée)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    networks:
+      - ot-ics-lab
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    volumes:
+      - ./lab-config/elasticsearch:/usr/share/elasticsearch/data
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    networks:
+      - ot-ics-lab
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
     restart: unless-stopped
 
 networks:
